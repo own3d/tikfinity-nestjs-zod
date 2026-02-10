@@ -36,7 +36,7 @@ export function createZodDto<
 
     static _output: unknown | undefined;
 
-    static Output() {
+    static get Output() {
       return this._output ??= this.CreateOutput();
     }
 
