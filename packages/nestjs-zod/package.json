@@ -1,6 +1,6 @@
 {
-  "name": "nestjs-zod",
-  "description": "All NestJS + Zod utilities you need",
+  "name": "@tikfinity/nestjs-zod",
+  "description": "All NestJS + Zod utilities you need, forked and adjusted for TikFinity",
   "version": "0.0.0-set-by-ci",
   "main": "./dist/index.cjs",
   "exports": {
@@ -36,8 +36,7 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "git@github.com:BenLorantfy/nestjs-zod.git",
-    "directory": "packages/nestjs-zod"
+    "url": "git@github.com:own3d/tikfinity-nestjs-zod.git",
   },
   "author": "Ben Lorantfy <ben@lorantfy.com>",
   "contributors": [
@@ -45,7 +44,7 @@
     "Evgeny Zakharov <to@risen.dev>"
   ],
   "publishConfig": {
-    "access": "public"
+    "registry": "https://npm.pkg.github.com"
   },
   "scripts": {
     "dev": "vite",

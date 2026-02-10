@@ -13,6 +13,9 @@ on:
 
 jobs:
   publish-npm:
+    permissions:
+      contents: read
+      packages: write
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -25,6 +28,8 @@ jobs:
         with:
           node-version: 20
           cache: 'pnpm'
+          registry-url: 'https://npm.pkg.github.com'
+          scope: '@${{ github.repository_owner }}'
       - run: pnpm install
       - name: Build z
         run: cd packages/z && pnpm build
@@ -75,10 +80,7 @@ jobs:
           cp README.md packages/nestjs-zod
           sed -i 's/\/packages\/example/\.\.\/example/g' packages/nestjs-zod/README.md
 
-      - name: Create NPM config
-        run: cd packages/nestjs-zod && npm config set //registry.npmjs.org/:_authToken $NPM_TOKEN
-        env:
-          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
-
-      - name: Publish to NPM
+      - name: Publish to GitHub Packages
         run: cd packages/nestjs-zod && npm publish
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
