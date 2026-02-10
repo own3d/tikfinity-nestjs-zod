@@ -80,7 +80,7 @@ jobs:
           cp README.md packages/nestjs-zod
           sed -i 's/\/packages\/example/\.\.\/example/g' packages/nestjs-zod/README.md
 
-      - name: Publish to GitHub Packages
+      - name: Publish to GitHub Packages test
         run: cd packages/nestjs-zod && npm publish
         env:
           NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
