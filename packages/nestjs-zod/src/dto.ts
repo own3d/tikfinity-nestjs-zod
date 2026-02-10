@@ -34,7 +34,13 @@ export function createZodDto<
       return this.schema.parse(input)
     }
 
-    static get Output() {
+    static _output: unknown | undefined;
+
+    static Output() {
+      return this._output ??= this.CreateOutput();
+    }
+
+    static CreateOutput() {
       assert('_zod' in schema, 'Output DTOs can only be created from zod v4 schemas')
       
       class AugmentedZodDto {
@@ -205,10 +211,42 @@ function openApiMetadataFactory({
 function generateJsonSchema(schema: z3.ZodTypeAny | ($ZodType & { parse: (input: unknown) => unknown; }), io: 'input' | 'output') {
   const generatedJsonSchema = '_zod' in schema ? toJSONSchema(schema, {
     io,
-    override: ({ jsonSchema }) => {
-        if (io === 'output' && 'id' in jsonSchema) {
-            jsonSchema.id = `${jsonSchema.id}_Output`;
-        }
+    unrepresentable: 'any',
+    override: (ctx) => {
+      const schemaAny: any = ctx.zodSchema as any;
+      const def = schemaAny._def ?? schemaAny._zod?.def;
+      if (def?.type === 'date') {
+        // Represent dates as RFC 3339 / OpenAPI date-time strings
+        ctx.jsonSchema.type = 'string';
+        ctx.jsonSchema.format = 'date-time';
+        ctx.jsonSchema.example = '2021-01-01T00:00:00.000Z';
+        return;
+      }
+
+      // Optionally: if you are worried about other unrepresentable types silently
+      // becoming `{}`, you can re-throw for them here:
+      //
+      // Zod’s docs list these as unrepresentable in JSON Schema by default:
+      // bigint, int64, symbol, void, date, map, set, transform, nan, custom
+      if (
+        def?.type === 'bigint' ||
+        def?.type === 'int64' ||
+        def?.type === 'symbol' ||
+        def?.type === 'void' ||
+        def?.type === 'map' ||
+        def?.type === 'set' ||
+        def?.type === 'transform' ||
+        def?.type === 'nan' ||
+        def?.type === 'custom'
+      ) {
+        throw new Error(
+          `Zod type "${def.type}" is not representable in JSON Schema – update your schema or add a custom mapping.`,
+        );
+      }
+
+      if (io === 'output' && 'id' in ctx.jsonSchema) {
+          ctx.jsonSchema.id = `${ctx.jsonSchema.id}_Output`;
+      }
     } 
   }) : zodV3ToOpenAPI(schema)
 
