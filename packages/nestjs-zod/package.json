@@ -1,5 +1,5 @@
 {
-  "name": "@tikfinity/nestjs-zod",
+  "name": "@own3d/nestjs-zod",
   "description": "All NestJS + Zod utilities you need, forked and adjusted for TikFinity",
   "version": "0.0.0-set-by-ci",
   "main": "./dist/index.cjs",
